@@ -11,8 +11,20 @@ import requests
 
 # ===== ONLINE (Google Drive public links for test) =====
 # Для теста файлы в Drive должны быть "Anyone with the link → Viewer".
-GDRIVE_MANIFEST_ID = os.getenv("GDRIVE_MANIFEST_ID", "1Re07GsnBCgIf38g-sHj6PwHhN86STu5s")
-GDRIVE_SNAPSHOT_ID = os.getenv("GDRIVE_SNAPSHOT_ID", "1iuDizQY5PldxlksmN_5f-kTEzTWKSoOg")
+def _get_secret(name: str, default: str) -> str:
+    # Streamlit Cloud Secrets
+    try:
+        import streamlit as st
+        if name in st.secrets:
+            return str(st.secrets[name]).strip()
+    except Exception:
+        pass
+    # fallback: env
+    return os.getenv(name, default).strip()
+
+GDRIVE_MANIFEST_ID = _get_secret("GDRIVE_MANIFEST_ID", "1Re07GsnBCgIf38g-sHj6PwHhN86STu5s")
+GDRIVE_SNAPSHOT_ID = _get_secret("GDRIVE_SNAPSHOT_ID", "1iuDizQY5PldxlksmN_5f-kTEzTWKSoOg")
+
 
 # ===== LOCAL (Access path) =====
 ACCESS_DB_PATH = os.getenv("ACCESS_DB_PATH", r"J:\02.Productions\GG\Ai\MainBaseAi.accdb")
@@ -159,3 +171,4 @@ def execute_access_query(sql: str) -> pd.DataFrame:
             pass
 
     return _execute_duckdb_on_snapshot(sql)
+
